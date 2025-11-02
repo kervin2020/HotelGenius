@@ -26,7 +26,6 @@ const restaurantMenuItems = [
   { title: "Menu", url: "/restaurant/menu", icon: UtensilsCrossed },
   { title: "Inventory", url: "/restaurant/inventory", icon: Package },
   { title: "Sales", url: "/restaurant/sales", icon: ShoppingCart },
-  { title: "Reports", url: "/restaurant/reports", icon: ClipboardList },
 ];
 
 const settingsItems = [

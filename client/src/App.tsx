@@ -24,79 +24,78 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 
-function Router() {
-  const [currentPath, setCurrentPath] = useState("/");
-
+function Router({ onPathChange }: { onPathChange: (path: string) => void }) {
   return (
     <Switch>
       <Route path="/">
         {() => {
-          setCurrentPath("/");
+          onPathChange("/");
           return <Dashboard />;
         }}
       </Route>
       <Route path="/rooms">
         {() => {
-          setCurrentPath("/rooms");
+          onPathChange("/rooms");
           return <Rooms />;
         }}
       </Route>
       <Route path="/reservations">
         {() => {
-          setCurrentPath("/reservations");
+          onPathChange("/reservations");
           return <Reservations />;
         }}
       </Route>
       <Route path="/clients">
         {() => {
-          setCurrentPath("/clients");
+          onPathChange("/clients");
           return <Clients />;
         }}
       </Route>
       <Route path="/payments">
         {() => {
-          setCurrentPath("/payments");
+          onPathChange("/payments");
           return <Payments />;
         }}
       </Route>
       <Route path="/restaurant/menu">
         {() => {
-          setCurrentPath("/restaurant/menu");
+          onPathChange("/restaurant/menu");
           return <RestaurantMenu />;
         }}
       </Route>
       <Route path="/restaurant/inventory">
         {() => {
-          setCurrentPath("/restaurant/inventory");
+          onPathChange("/restaurant/inventory");
           return <RestaurantInventory />;
         }}
       </Route>
       <Route path="/restaurant/sales">
         {() => {
-          setCurrentPath("/restaurant/sales");
+          onPathChange("/restaurant/sales");
           return <RestaurantSales />;
         }}
       </Route>
       <Route path="/reports">
         {() => {
-          setCurrentPath("/reports");
+          onPathChange("/reports");
           return <Reports />;
         }}
       </Route>
       <Route path="/settings">
         {() => {
-          setCurrentPath("/settings");
+          onPathChange("/settings");
           return <Settings />;
         }}
       </Route>
       <Route path="/super-admin">
         {() => {
-          setCurrentPath("/super-admin");
+          onPathChange("/super-admin");
           return <SuperAdmin />;
         }}
       </Route>
       <Route path="/login">
         {() => {
+          onPathChange("/login");
           return <Login />;
         }}
       </Route>
@@ -106,6 +105,8 @@ function Router() {
 }
 
 export default function App() {
+  const [currentPath, setCurrentPath] = useState("/");
+  
   const style = {
     "--sidebar-width": "16rem",
   };
@@ -115,7 +116,7 @@ export default function App() {
       <TooltipProvider>
         <SidebarProvider style={style as React.CSSProperties}>
           <div className="flex h-screen w-full">
-            <AppSidebar currentPath="/" userRole="owner" />
+            <AppSidebar currentPath={currentPath} userRole="owner" />
             <div className="flex flex-col flex-1 overflow-hidden">
               <header className="flex items-center justify-between p-4 border-b sticky top-0 bg-background z-10">
                 <SidebarTrigger data-testid="button-sidebar-toggle" />
@@ -130,7 +131,7 @@ export default function App() {
                 </div>
               </header>
               <main className="flex-1 overflow-auto p-6">
-                <Router />
+                <Router onPathChange={setCurrentPath} />
               </main>
             </div>
           </div>
