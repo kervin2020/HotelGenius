@@ -1,6 +1,10 @@
 
 
+<<<<<<< HEAD
 > ⚙️ But : Créer un guide d’apprentissage extrêmement complet et pédagogique pour apprendre à reconstruire le SaaS complet HotelGenius present dans ce folder, depuis zéro (planification, conception, backend, frontend, sécurité, tests, déploiement, maintenance, scalabilité).
+=======
+> ⚙️ But : Créer un guide d’apprentissage extrêmement complet et pédagogique pour apprendre à reconstruire le SaaS complet HotelGenius, depuis zéro (planification, conception, backend, frontend, sécurité, tests, déploiement, maintenance, scalabilité).
+>>>>>>> 8c3d4fdf7429f8d248d2b5ccf474f5b9b1b58318
 
 Le guide doit être structuré, progressif, et illustré d’explications claires, comme un cours magistral.
 
