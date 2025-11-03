@@ -1,0 +1,28 @@
+
+
+> ⚙️ But : Créer un guide d’apprentissage extrêmement complet et pédagogique pour apprendre à construire un SaaS complet HotelGenius, depuis zéro (planification, conception, backend, frontend, sécurité, tests, déploiement, maintenance, scalabilité).
+
+Le guide doit être structuré, progressif, et illustré d’explications claires, comme un cours magistral.
+
+Il doit :
+
+Être découpé en modules pédagogiques (ou sprints) avec objectifs clairs, définitions et concepts clés.
+
+Expliquer chaque décision technique (pourquoi ce framework, cette architecture, etc.).
+
+Enseigner en même temps la théorie et la pratique, ligne par ligne quand nécessaire.
+
+Me guider depuis un projet vide jusqu’au déploiement complet.
+
+Inclure la partie maintenance, monitoring, sécurité, performance et scalabilité SaaS multi-tenant.
+
+Utiliser une approche de formation active : je construis pendant que j’apprends.
+
+Fournir le code exact à copier-coller à chaque étape, avec des explications.\n\n\n🧱 Structure attendue du guide :\n1. Introduction : vision, objectifs, outils nécessaires.\n2. Planification (analyse du domaine, modélisation, architecture choisie : monorepo full-stack TypeScript).\n3. Sprint 1 : création du monorepo, configuration initiale.\n4. Sprint 2 : conception et base de données (PostgreSQL + Drizzle ORM).\n5. Sprint 3 : backend Express (auth, routes CRUD, multi-tenant isolation, validations Zod, sécurité JWT).\n6. Sprint 4 : frontend React + Vite + Tailwind + TanStack Query + shadcn/ui.\n7. Sprint 5 : intégration front/back, tests unitaires et d’intégration, gestion des erreurs.\n8. Sprint 6 : sécurité avancée, CI/CD, déploiement (Railway, Vercel, Neon, GitHub Actions).\n9. Sprint 7 : maintenance, monitoring (Sentry, UptimeRobot), gestion des logs et sauvegardes.\n10. Sprint 8 : scalabilité et optimisation (index, cache Redis, queues, CDN, multi-tenant schema isolation).\n\n\n🎓 Style d’écriture attendu :\n- Très pédagogique, comme un mentor qui enseigne pas à pas.\n- Chaque concept doit être défini simplement avant d’être appliqué (ex: « Qu’est-ce qu’un ORM ? », « Pourquoi TypeScript ? », etc.).\n- Donne des analogies, comparaisons, et conseils pratiques.\n- Fournis des checkpoints à la fin de chaque sprint pour tester la compréhension.\n- Indique comment organiser les issues GitHub (titre + description) pour chaque tâche.\n- Intègre des explications de bonnes pratiques (sécurité, performances, structuration du code, tests, déploiement continu, etc.).\n\n\n🧩 Technologies utilisées :\n- TypeScript (full-stack)\n- React 18 + Vite + TailwindCSS + shadcn/ui\n- Node.js + Express\n- PostgreSQL + Drizzle ORM\n- JWT Auth + bcrypt + Zod\n- TanStack Query (React Query)\n- Vitest / Supertest pour tests\n- Railway / Neon / Vercel pour hébergement\n- GitHub Actions pour CI/CD\n- Sentry + UptimeRobot pour monitoring\n\n\n📘 Format attendu :\n- Document long et structuré (peut dépasser 100 pages s’il le faut)\n- Chaque section commence par « 🎯 Objectif », « 🧠 Concepts », « ⚙️ Étapes pratiques », « 💡 Astuce », et « ✅ Checkpoint ».\n- Inclure des diagrammes textuels (ASCII ou mermaid) pour expliquer l’architecture.\n- Prévoir un résumé des connaissances acquises à la fin.\n\n\n✳️ Demande finale :\nCrée ce guide complet, intitulé :\n> « HotelGenius — Formation complète pour construire un SaaS multi-tenant de zéro à la production »\n\net rédige-le en français clair, fluide et professionnel, avec des touches techniques anglaises quand c’est naturel (par ex. « deployment pipeline », « backend layer », etc.).\n\nIl doit être assez complet pour permettre à une personne seule d’apprendre et de construire le projet de A à Z, y compris la maintenance et la scalabilité SaaS.\n\n---\n\n### 💬 Exemple d’amorce à ajouter à ton prompt si tu veux un ton précis\n\n- Version mentor patient :
+Adopte le ton d’un mentor expérimenté qui enseigne calmement chaque notion en expliquant « pourquoi » avant le « comment ».\n\n- Version cours universitaire :
+Écris comme un cours complet structuré avec définitions, exemples, exercices, quiz et corrigés.\n\n- Version ingénierie avancée :
+Conçois le guide comme une documentation d’ingénierie professionnelle pour apprendre à concevoir des SaaS scalables et multi-tenant.\n\n---\n\nSouhaites-tu que je génère ce guide maintenant à partir de ce prompt (ça fera un document long, découpé par sprints, très détaillé et pédagogique) ?
+
+
+
+
