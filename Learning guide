@@ -1,0 +1,890 @@
+HotelGenius — Guide d’apprentissage complet pour reconstruire le projet de zéro
+
+> Langue : Français (avec termes techniques en anglais quand approprié)
+
+
+
+
+---
+
+But du guide
+
+Ce guide est conçu pour te faire apprendre en pratiquant : il t’accompagne pas-à‑pas pour reconstruire HotelGenius depuis zéro (monorepo TypeScript, PostgreSQL + Drizzle, backend Express, frontend React + Vite, tests, CI/CD, déploiement). Chaque jour a des objectifs clairs, des commandes à exécuter, du code à copier-coller et des exercices pour vérifier ta compréhension.
+
+Tu peux suivre ce guide tel quel (6 semaines), ou accélérer / ralentir selon ta disponibilité.
+
+
+---
+
+Comment utiliser ce guide
+
+Chaque semaine est divisée en 5 jours de travail (lundi–vendredi). Tu peux convertir en plus ou moins de jours selon ton emploi du temps.
+
+À la fin de chaque jour : Checkpoint (tests miniatures, vérifications). Si tu bloques, copie l’erreur ici et je t’aide.
+
+J’inclus des issues GitHub (titre + description) prêtes à créer.
+
+
+
+---
+
+Semaine 1 — Fondations & Base de données (5 jours)
+
+Objectif semaine
+
+Avoir un monorepo initialisé, un schéma Drizzle complet et migrations exécutées sur une base PostgreSQL.
+
+Jour 1 — Setup monorepo et outils
+
+Objectifs : initialiser repo, installer pnpm, config workspace, créer dossiers.
+
+Commandes
+
+mkdir hotelgenius && cd hotelgenius
+git init
+pnpm init -y
+# modifie package.json :
+# "workspaces": ["client","server","shared"]
+mkdir client server shared
+pnpm -w add -D typescript eslint prettier
+
+Checkpoint
+
+git status montre repo initialisé
+
+package.json à la racine contient workspaces
+
+
+Issue GitHub
+
+Titre: "Init monorepo + tooling"
+
+Description: "Init repo, pnpm workspace, créer dossiers client/server/shared, installer TypeScript, ESLint, Prettier."
+
+
+
+---
+
+Jour 2 — Initialiser shared/ + Drizzle
+
+Objectifs : créer package shared, installer drizzle-orm et drizzle-kit, créer shared/src/schema.ts.
+
+Commandes
+
+cd shared
+pnpm init -y
+pnpm add drizzle-orm drizzle-kit pg
+pnpm add -D typescript
+pnpm tsc --init
+
+Fichier shared/src/schema.ts (copie-coller)
+
+import { pgTable, varchar, text, integer, timestamp, sql, uniqueIndex } from "drizzle-orm/pg-core";
+
+export const hotels = pgTable("hotels", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  address: text("address"),
+  currency: varchar("currency", { length: 3 }).default("HTG"),
+  created_at: timestamp("created_at").defaultNow(),
+});
+
+export const rooms = pgTable("rooms", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  hotel_id: varchar("hotel_id").notNull().references(() => hotels.id),
+  room_number: text("room_number").notNull(),
+  room_type: text("room_type").notNull(),
+  capacity: integer("capacity").notNull(),
+  price_per_night: integer("price_per_night").notNull(),
+  status: varchar("status", { length: 20 }).default("available"),
+  created_at: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  hotelRoomIdx: uniqueIndex("hotel_room_idx").on(table.hotel_id, table.room_number),
+}));
+
+// TODO: ajouter clients, reservations, payments, products, inventory
+
+Checkpoint
+
+shared compile (pnpm -w --filter shared tsc)
+
+schema.ts présent
+
+
+Issue GitHub
+
+Titre: "Shared: Drizzle schema initial"
+
+Description: "Ajouter hotels et rooms, préparer pour migrations"
+
+
+
+---
+
+Jour 3 — Compléter schéma & relations
+
+Objectifs : ajouter tables users, clients, reservations, payments, products, inventory_items, sales.
+
+Extrait exemple reservations (copie)
+
+export const clients = pgTable("clients", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  hotel_id: varchar("hotel_id").notNull().references(() => hotels.id),
+  first_name: text("first_name").notNull(),
+  last_name: text("last_name"),
+  phone: text("phone"),
+  email: text("email"),
+  created_at: timestamp("created_at").defaultNow(),
+});
+
+export const reservations = pgTable("reservations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  hotel_id: varchar("hotel_id").notNull().references(() => hotels.id),
+  room_id: varchar("room_id").notNull().references(() => rooms.id),
+  client_id: varchar("client_id").notNull().references(() => clients.id),
+  checkin_at: timestamp("checkin_at"),
+  checkout_at: timestamp("checkout_at"),
+  status: varchar("status", { length: 20 }).default("pending"),
+  created_at: timestamp("created_at").defaultNow(),
+});
+
+Checkpoint
+
+schema.ts contient toutes les tables
+
+
+Issue GitHub
+
+Titre: "Shared: Full schema (clients, reservations, payments, products, inventory)"
+
+Description: "Ajout des tables et relations"
+
+
+
+---
+
+Jour 4 — Configurer drizzle-kit + migrations
+
+Objectifs : config drizzle.config.ts, générer migration et exécuter sur DB locale / Neon.
+
+Commandes
+
+pnpm add -D drizzle-kit
+# créer drizzle.config.ts à la racine ou dans shared
+# Exemple de commande
+pnpm dlx drizzle-kit generate
+pnpm dlx drizzle-kit migrate
+
+Checkpoint
+
+Migrations créées dans dossier drizzle/migrations
+
+Tables présentes dans la DB (psql ou GUI)
+
+
+Issue GitHub
+
+Titre: "DB: generate & run migrations"
+
+Description: "Configurer drizzle-kit, générer migration initiale et apply"
+
+
+
+---
+
+Jour 5 — Tests & Documentation ERD
+
+Objectifs : Vérifier intégrité DB, créer diagramme ER et README pour la DB.
+
+Tâches
+
+Exporter diagramme (draw.io ou Mermaid)
+
+Documenter contraintes importantes (unique index hotel+room_number)
+
+Tester via psql: SELECT * FROM rooms LIMIT 1;
+
+
+Checkpoint
+
+ERD enregistré dans docs/erd.png ou docs/erd.md
+
+
+Issue GitHub
+
+Titre: "Docs: ERD & DB README"
+
+Description: "Ajouter diagramme ER et expliquer contraintes"
+
+
+
+---
+
+Semaine 2 — Backend minimal (5 jours)
+
+Objectif semaine
+
+Construire l’API Express avec auth (JWT), DatabaseStorage et CRUD de base.
+
+Jour 1 — Setup server TypeScript + dependencies
+
+Commandes
+
+cd ../server
+pnpm init -y
+pnpm add express dotenv cors jsonwebtoken bcryptjs zod drizzle-orm pg
+pnpm add -D typescript ts-node-dev @types/express @types/node @types/jsonwebtoken
+pnpm tsc --init
+
+Fichier server/src/index.ts (starter)
+
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+dotenv.config();
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.get('/health', (_, res) => res.json({ ok: true }));
+const port = process.env.PORT ?? 5000;
+app.listen(port, () => console.log(`Server listening on ${port}`));
+
+Checkpoint
+
+pnpm -w --filter server dev démarre le serveur
+
+
+Issue GitHub
+
+Titre: "Server: TypeScript + Express setup"
+
+Description: "Init server, deps, starter index.ts"
+
+
+
+---
+
+Jour 2 — DatabaseStorage (abstraction)
+
+Objectifs : Créer server/src/storage/DatabaseStorage.ts qui utilise Drizzle pour CRUD.
+
+Pattern attendu
+
+createRoom(data), getRooms(hotelId), updateRoom(id, data), deleteRoom(id)
+
+
+Checkpoint
+
+Unit tests simples pour DatabaseStorage (Vitest)
+
+
+Issue GitHub
+
+Titre: "Server: DatabaseStorage implementation"
+
+Description: "Implement repository wrapper around Drizzle queries"
+
+
+
+---
+
+Jour 3 — Auth (register/login) et middleware
+
+Objectifs : endpoints /api/auth/register, /api/auth/login, middleware authenticate.
+
+Snippet authenticate (copie)
+
+import jwt from 'jsonwebtoken';
+export function authenticate(req, res, next) {
+  const header = req.headers.authorization;
+  if (!header) return res.status(401).json({ message: 'Unauthorized' });
+  const token = header.split(' ')[1];
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET!);
+    req.user = payload;
+    next();
+  } catch (err) { return res.status(401).json({ message: 'Invalid token' }); }
+}
+
+Checkpoint
+
+Able to POST /api/auth/register and receive 201
+
+POST /api/auth/login returns { token }
+
+
+Issue GitHub
+
+Titre: "Auth: register & login + authenticate middleware"
+
+Description: "Implement auth flow with bcrypt and JWT"
+
+
+
+---
+
+Day 4 — Routes rooms CRUD
+
+Objectifs : routes GET /api/rooms, POST /api/rooms, PATCH /api/rooms/:id, DELETE /api/rooms/:id.
+
+Points importants
+
+Validation Zod for input
+
+Use req.user.hotel_id to isolate tenant data
+
+
+Checkpoint
+
+Test via curl/postman: create and list rooms
+
+
+Issue GitHub
+
+Titre: "API: rooms CRUD"
+
+Description: "Implement all CRUD endpoints for rooms with validation and auth"
+
+
+
+---
+
+Jour 5 — Global error handler & logging
+
+Objectifs : central error handler, simple logger (console to start), structure des routes.
+
+Snippet error handler
+
+app.use((err, req, res, next) => {
+  console.error(err);
+  const status = err.status || 500;
+  res.status(status).json({ message: err.message || 'Internal Server Error' });
+});
+
+Checkpoint
+
+Error handler kicks in for thrown errors
+
+
+Issue GitHub
+
+Titre: "Server: error handler & basic logging"
+
+Description: "Add centralized error middleware and logs"
+
+
+
+---
+
+Semaine 3 — Backend avancé (5 jours)
+
+Objectif semaine
+
+Ajouter réservations, paiements (Stripe sandbox) et facturation PDF.
+
+Jour 1 — Reservations CRUD + business rules
+
+Objectifs : création réservation avec vérification de disponibilité (no double booking), check-in/out endpoints.
+
+Pseudo-algo de vérification disponibilité
+
+1. Rechercher reservations existantes pour la même room avec chevauchement de dates
+
+
+2. Si overlap -> rejeter
+
+
+
+Checkpoint
+
+Ability to create reservation for free slot
+
+
+Issue GitHub
+
+Titre: "Reservations: create with availability check"
+
+
+
+---
+
+Jour 2 — Payments (stripe sandbox)
+
+Objectifs : implémenter endpoints pour créer paiement / webhook (sandbox). Use Stripe test keys.
+
+Tâches
+
+Installer stripe SDK
+
+Endpoint /api/payments/create-intent -> retourne client_secret
+
+Webhook /api/payments/webhook pour confirmer status
+
+
+Checkpoint
+
+Créer payment intent et simuler succès via Stripe Dashboard
+
+
+Issue GitHub
+
+Titre: "Payments: stripe integration (test)"
+
+
+
+---
+
+Jour 3 — Génération de facture PDF
+
+Objectifs : produire PDF invoice lié à reservation/payment (pdfkit or jsPDF server-side)
+
+Checkpoint
+
+Endpoint /api/invoices/:id/pdf renvoie PDF téléchargeable
+
+
+Issue GitHub
+
+Titre: "Invoices: generate PDF"
+
+
+
+---
+
+Jour 4 — Relations & transactions
+
+Objectifs : Utiliser transactions Drizzle pour opérations atomiques (ex: create reservation + payment)
+
+Checkpoint
+
+Transaction rollback en cas d’erreur
+
+
+Issue GitHub
+
+Titre: "DB: use transactions for booking+payment"
+
+
+
+---
+
+Jour 5 — Docs API & Postman collection
+
+Objectifs : documenter endpoints, exporter collection Postman/ThunderClient
+
+Checkpoint
+
+Postman import fonctionne
+
+
+Issue GitHub
+
+Titre: "Docs: API & Postman collection"
+
+
+
+---
+
+Semaine 4 — Frontend (5 jours)
+
+Objectif semaine
+
+Construire l’interface React connectée à l’API pour le module hôtel.
+
+Jour 1 — Init client Vite + Tailwind
+
+Commandes
+
+cd ../client
+pnpm create vite@latest . --template react-ts
+pnpm add -D tailwindcss postcss autoprefixer
+pnpm add @tanstack/react-query wouter
+pnpm tailwindcss init -p
+
+Checkpoint
+
+pnpm dev démarre l’app Vite
+
+
+Issue GitHub
+
+Titre: "Client: Vite + Tailwind setup"
+
+
+
+---
+
+Jour 2 — Auth UI + login form
+
+Objectifs : page /login, form, call /api/auth/login, gérer token (cookie httpOnly or in-memory)
+
+Checkpoint
+
+User can login and token is stored (or cookie set)
+
+
+Issue GitHub
+
+Titre: "Client: login page and auth flow"
+
+
+
+---
+
+Jour 3 — Dashboard + rooms page
+
+Objectifs : pages /dashboard, /rooms (list + create modal), use useRooms hook
+
+Exemple hook useRooms
+
+import { useQuery } from '@tanstack/react-query';
+export function useRooms() {
+  return useQuery(['rooms'], async () => {
+    const res = await fetch('/api/rooms', { credentials: 'include' });
+    if (!res.ok) throw new Error('Failed');
+    return res.json();
+  });
+}
+
+Checkpoint
+
+Rooms list displays data from API
+
+
+Issue GitHub
+
+Titre: "Client: rooms page + hooks"
+
+
+
+---
+
+Jour 4 — Reservations UI (calendar or list)
+
+Objectifs : page reservations + create reservation form with date pickers
+
+Checkpoint
+
+Create reservation flow works end-to-end (frontend -> backend)
+
+
+Issue GitHub
+
+Titre: "Client: reservations page"
+
+
+
+---
+
+Jour 5 — Polishing UI & responsive
+
+Objectifs : style pages, mobile responsive, shared components (Card, Table, Modal)
+
+Checkpoint
+
+Basic responsive checks pass
+
+
+Issue GitHub
+
+Titre: "Client: components library and responsive fixes"
+
+
+
+---
+
+Semaine 5 — Module restaurant & tests (5 jours)
+
+Objectif semaine
+
+Implémenter menu, inventaire, ventes et ajouter tests unitaires et d’intégration.
+
+Jour 1 — API products & inventory
+
+Objectifs : CRUD products, inventory adjustments
+
+Checkpoint
+
+Products CRUD tested via Postman
+
+
+Issue GitHub
+
+Titre: "API: products & inventory"
+
+
+
+---
+
+Jour 2 — Client: menu page
+
+Objectifs : page /restaurant/menu, search, add to order
+
+Checkpoint
+
+Order creation flows to server
+
+
+Issue GitHub
+
+Titre: "Client: menu page"
+
+
+
+---
+
+Jour 3 — Sales & link to room invoices
+
+Objectifs : sale entries, option to bill to room
+
+Checkpoint
+
+Sale recorded and linkable to reservation
+
+
+Issue GitHub
+
+Titre: "API: sales + link to reservations"
+
+
+
+---
+
+Jour 4 — Tests unitaires (Vitest)
+
+Objectifs : config Vitest, écrire tests pour DatabaseStorage et utilitaires
+
+Commandes
+
+pnpm add -D vitest @types/jest
+# ajouter script "test:server"
+
+Checkpoint
+
+Tests passent localement
+
+
+Issue GitHub
+
+Titre: "Tests: Vitest config + storage tests"
+
+
+
+---
+
+Jour 5 — Tests d’intégration (supertest)
+
+Objectifs : écrire tests pour routes critiques (auth, create booking)
+
+Checkpoint
+
+CI pourra exécuter ces tests
+
+
+Issue GitHub
+
+Titre: "Tests: integration tests with supertest"
+
+
+
+---
+
+Semaine 6 — Sécurité, CI/CD & Déploiement (5 jours)
+
+Objectif semaine
+
+Durcir sécurité, configurer GitHub Actions et déployer app.
+
+Jour 1 — Sécurité et hardening
+
+Tâches : ajouter helmet, express-rate-limit, vérifier CORS, HTTPS en prod
+
+Checkpoint
+
+Scans npm audit et corrections basiques
+
+
+Issue GitHub
+
+Titre: "Security: helmet + rate-limit"
+
+
+
+---
+
+Jour 2 — Préparer variables et secrets
+
+Tâches : .env.production template, secrets manager notes
+
+Checkpoint
+
+.env.example prêt
+
+
+Issue GitHub
+
+Titre: "Ops: env.example and secrets"
+
+
+
+---
+
+Jour 3 — GitHub Actions (CI)
+
+Tâches : pipeline : install, test, build (client + server)
+
+Exemple workflow /.github/workflows/ci.yml
+
+name: CI
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with: { version: '8' }
+      - run: pnpm install
+      - run: pnpm -w test
+
+Checkpoint
+
+CI green on push
+
+
+Issue GitHub
+
+Titre: "CI: GitHub Actions setup"
+
+
+
+---
+
+Jour 4 — Déploiement (staging)
+
+Tâches : déployer backend+DB sur Railway/Neon, frontend sur Vercel
+
+Checklist deploy
+
+Set DATABASE_URL, JWT_SECRET, STRIPE_KEYS
+
+Build & run smoke tests
+
+
+Checkpoint
+
+App accessible en staging URL
+
+
+Issue GitHub
+
+Titre: "Deploy: staging setup"
+
+
+
+---
+
+Jour 5 — Go-live & post-deploy checks
+
+Tâches : tests e2e, monitoring (Sentry), backup plan
+
+Checkpoint
+
+Production ready checklist complet
+
+
+Issue GitHub
+
+Titre: "Launch: production deploy & checklist"
+
+
+
+---
+
+Checkpoints de fin de projet (acceptance criteria)
+
+1. Toutes les routes principales implémentées et testées
+
+
+2. Auth sécurisé (password hashing, JWT, tokens révoqués si nécessaire)
+
+
+3. DB migrations reproductibles et versionnées
+
+
+4. Frontend connecté et responsive
+
+
+5. Tests unitaires + intégration automatiques dans CI
+
+
+6. Déploiement automatisé (workflow) avec variables d’environnement configurées
+
+
+
+
+---
+
+Annexes rapides
+
+Commandes récap
+
+pnpm -w install : installer tout dans le workspace
+
+pnpm -w test : lancer tests workspace
+
+pnpm dlx drizzle-kit generate / migrate : migrations
+
+
+Ressources d'apprentissage
+
+Drizzle ORM docs
+
+TanStack Query docs
+
+Express docs
+
+React + Vite + Tailwind
+
+
+
+---
+
+Prochaine action que je peux faire pour toi immédiatement
+
+🔁 Générer le GitHub Projects JSON (board avec toutes les issues ci‑dessus) prêt à importer.
+
+📦 Créer les fichiers d'initialisation (package.json templates, tsconfig, .eslintrc, scripts) pour client/server/shared et les ajouter dans le document.
+
+🚀 Commencer Sprint 1 en te fournissant les commandes exactes et les fichiers prêts à copier-coller pour exécuter localement.
+
+
+Dis-moi directement laquelle tu veux que je fasse maintenant — je l’exécute tout de suite et j’ajoute le résultat dans ce document.
+
+
+
+Super — j’ai transformé le plan de sprints en un guide d’apprentissage complet, jour-par-jour (6 semaines), avec :
+
+actions et commandes précises,
+
+snippets prêt à copier-coller,
+
+issues GitHub prêtes (titres + descriptions),
+
+checkpoints et critères d’acceptation. ✅
+
+
+Tu veux que je fasse tout de suite l’une des actions suivantes (je l’exécute et ajoute le résultat dans le document) :
+
+1. Générer le GitHub Projects (board) JSON prêt à importer.
+
+
+2. Créer les fichiers d’initialisation (package.json pour chaque workspace, tsconfig, .eslintrc, scripts).
+
+
+3. Lancer et détailler Sprint 1 avec fichiers complets (schéma Drizzle final, drizzle.config, migration SQL, commandes pas-à-pas).
+
+
+
+Dis 1, 2 ou 3 — j’exécute maintenant. 🚀
+
