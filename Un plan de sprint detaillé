@@ -1,0 +1,356 @@
+HotelGenius — Plan de sprints détaillé (6 semaines)
+
+> Langue : Français (avec termes techniques en anglais quand approprié)
+
+
+
+
+---
+
+Vue d’ensemble
+
+L’objectif est de reconstruire HotelGenius intégralement en 6 semaines. Chaque semaine représente un sprint avec des objectifs clairs, des tâches pratiques, et des livrables mesurables.
+
+Chaque sprint contient :
+
+🎯 Objectif général
+
+🧩 Modules concernés
+
+🧠 Concepts à maîtriser
+
+🧰 Tâches (issues GitHub recommandées)
+
+✅ Livrables finaux
+
+
+
+---
+
+🗓️ Semaine 1 — Conception & Base de données (Fondations)
+
+🎯 Objectif général
+
+Mettre en place l’architecture du monorepo, modéliser le domaine métier et créer la base de données avec Drizzle ORM.
+
+🧩 Modules concernés
+
+shared/ — schémas et types communs
+
+server/ — configuration DB et ORM
+
+
+🧠 Concepts
+
+Modélisation relationnelle (diagramme ER)
+
+Multi-tenant schema (champ hotel_id)
+
+Drizzle ORM + PostgreSQL + migrations
+
+
+🧰 Tâches (issues GitHub suggérées)
+
+[ ] Créer le dépôt Git et initialiser le monorepo (pnpm init -y)
+
+[ ] Configurer pnpm-workspace.yaml
+
+[ ] Créer les dossiers client/, server/, shared/
+
+[ ] Installer et configurer Drizzle ORM dans shared/
+
+[ ] Créer les tables : hotels, users, rooms, clients, reservations, payments, invoices, products, inventory_items, sales
+
+[ ] Générer et exécuter les migrations
+
+[ ] Tester la connexion PostgreSQL locale / Neon
+
+
+✅ Livrables
+
+Monorepo initialisé
+
+Schéma complet Drizzle
+
+Migrations exécutées avec succès
+
+Documentation du diagramme ER (draw.io ou Mermaid)
+
+
+
+---
+
+🗓️ Semaine 2 — Backend minimal (Auth & Core CRUD)
+
+🎯 Objectif général
+
+Créer le backend Express avec authentification JWT, routes CRUD de base et structure modulaire.
+
+🧩 Modules concernés
+
+server/ — routes, middleware, storage layer
+
+shared/ — schémas Zod et types
+
+
+🧠 Concepts
+
+Express.js architecture
+
+JWT authentication & middleware
+
+Repository pattern pour accès DB
+
+Validation Zod
+
+
+🧰 Tâches (issues)
+
+[ ] Configurer TypeScript + Express + ts-node-dev
+
+[ ] Créer DatabaseStorage (abstraction CRUD)
+
+[ ] Créer middleware authenticate
+
+[ ] Créer routes : /api/auth/register, /api/auth/login, /api/rooms (GET/POST/PATCH/DELETE)
+
+[ ] Ajouter validation Zod pour chaque endpoint
+
+[ ] Gérer erreurs globales (error handler middleware)
+
+
+✅ Livrables
+
+API Express fonctionnelle
+
+Auth JWT opérationnelle
+
+CRUD rooms complet
+
+Tests Postman / ThunderClient réussis
+
+
+
+---
+
+🗓️ Semaine 3 — Backend avancé (Business logic & Paiements)
+
+🎯 Objectif général
+
+Étendre le backend : réservations, paiements, facturation, relations entre entités.
+
+🧩 Modules concernés
+
+server/ — nouvelles routes, contrôleurs, intégrations Stripe
+
+shared/ — nouveaux schémas et validations
+
+
+🧠 Concepts
+
+Relations 1-N et N-N avec Drizzle
+
+Transactions SQL
+
+Paiements (Stripe API sandbox)
+
+
+🧰 Tâches
+
+[ ] Routes /api/reservations, /api/payments, /api/clients
+
+[ ] Validation stricte (Zod + contraintes DB)
+
+[ ] Intégrer Stripe (sandbox)
+
+[ ] Générer factures PDF (bibliothèque jsPDF ou pdfkit)
+
+
+✅ Livrables
+
+API hôtel complète
+
+Paiements fonctionnels en sandbox
+
+Documentation API (Swagger ou README)
+
+
+
+---
+
+🗓️ Semaine 4 — Frontend (Interface principale)
+
+🎯 Objectif général
+
+Créer l’interface React du module hôtel : dashboard, chambres, réservations, clients.
+
+🧩 Modules concernés
+
+client/ — pages, composants, hooks
+
+shared/ — types et validations réutilisés
+
+
+🧠 Concepts
+
+React + Vite + Tailwind CSS
+
+shadcn/ui (composants UI accessibles)
+
+TanStack Query (data fetching + cache)
+
+
+🧰 Tâches
+
+[ ] Créer pages : /login, /dashboard, /rooms, /reservations, /clients
+
+[ ] Créer hooks useRooms, useReservations, useClients
+
+[ ] Intégrer TanStack Query Provider
+
+[ ] Mettre en place design system (Tailwind + shadcn/ui)
+
+
+✅ Livrables
+
+Frontend minimal connecté à l’API
+
+Navigation fonctionnelle
+
+Composants UI cohérents (Card, Table, Form)
+
+
+
+---
+
+🗓️ Semaine 5 — Module Restaurant & Tests
+
+🎯 Objectif général
+
+Implémenter le module restaurant complet (menu, stock, ventes) et ajouter les tests unitaires et d’intégration.
+
+🧩 Modules concernés
+
+server/ — routes restaurant
+
+client/ — pages restaurant
+
+
+🧠 Concepts
+
+Gestion des relations complexes (ventes → produits)
+
+Vitest + Supertest (backend)
+
+Optimistic UI updates
+
+
+🧰 Tâches
+
+[ ] Routes /api/products, /api/inventory, /api/sales
+
+[ ] Pages /restaurant/menu, /restaurant/inventory, /restaurant/sales
+
+[ ] Tests unitaires sur DatabaseStorage
+
+[ ] Tests d’intégration (routes Express)
+
+
+✅ Livrables
+
+Module restaurant opérationnel
+
+Tests backend >70% coverage
+
+UI complète restaurant
+
+
+
+---
+
+🗓️ Semaine 6 — Sécurité, CI/CD & Déploiement
+
+🎯 Objectif général
+
+Finaliser le projet, renforcer la sécurité et automatiser le déploiement.
+
+🧩 Modules concernés
+
+server/, client/, CI/CD pipelines
+
+
+🧠 Concepts
+
+Sécurité avancée (rate limiting, Helmet)
+
+Variables d’environnement et secrets
+
+GitHub Actions, Railway, Vercel
+
+
+🧰 Tâches
+
+[ ] Ajouter Helmet + express-rate-limit
+
+[ ] Configurer .env.production
+
+[ ] Créer workflow GitHub Actions (build + test + deploy)
+
+[ ] Déployer : backend + DB (Railway / Neon) et frontend (Vercel)
+
+[ ] Rédiger README final et documentation API
+
+
+✅ Livrables
+
+Application déployée en production
+
+CI/CD fonctionnel
+
+Documentation complète
+
+
+
+---
+
+🔁 Bonus (Semaine 7+)
+
+Ajouter analytics globales (MRR, taux d’occupation)
+
+Intégrer emails transactionnels (SendGrid)
+
+Mettre en place monitoring (Sentry, UptimeRobot)
+
+
+
+---
+
+> 💡 Astuce : Chaque semaine correspond à un milestone GitHub.
+Les issues listées peuvent être copiées directement dans ton tableau de projet GitHub pour un suivi agile (To do → In Progress → Done).
+
+
+
+
+---
+
+Souhaites-tu que je te génère ensuite :
+
+1. Le tableau GitHub Projects complet (JSON ou Markdown prêt à importer) basé sur ce plan ?
+
+
+2. Ou directement le Sprint 1 (Semaine 1) détaillé avec toutes les commandes, schémas Drizzle et fichiers initiaux ?
+
+
+
+
+
+Parfait — j’ai créé le guide complet dans un document (tu le vois dans l’espace à côté de la conversation). ✅
+
+Je peux maintenant, tout de suite (choisis une option, je l’exécute directement) :
+
+A. Générer les fichiers d’initialisation (templates package.json, tsconfig.json, .eslintrc, scripts de démarrage) pour client/, server/, shared/.
+B. Te fournir un plan de sprint détaillé jour-par-jour (issues/actions prêt·e·s à copier dans GitHub) pour les 6 semaines.
+C. Commencer immédiatement la Semaine 1 : te donner la checklist, les commandes et le code exact pour créer les tables Drizzle + exécuter les migrations (prêt à copier-coller).
+
+Dis A, B ou C — je fais ça maintenant dans le document. 🚀
+
